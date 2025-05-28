@@ -23,8 +23,7 @@ You can find admin [API definition](openapi.yml) in repo files.
 1. **Install plugin package**
    <!-- code block:  -->
     ```bash
-    yarn add medusa-plugin-assets-services
-    npm install
+    yarn add @o2s/medusa-plugin-assets-services
     ```
 
 2. **Register plugin in `medusa-config.js`**
