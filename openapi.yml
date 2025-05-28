@@ -1,0 +1,771 @@
+openapi: 3.0.0
+info:
+  title: Medusa Product Relations Plugin API
+  description: API for managing product relations, service instances, and assets
+  version: 1.0.0
+servers:
+  - url: /admin
+    description: Admin API
+
+tags:
+  - name: Products
+    description: Operations related to products and product relationships
+  - name: Service Instances
+    description: Operations for managing service instances
+  - name: Assets
+    description: Operations for managing assets
+
+components:
+  schemas:
+    ProductReference:
+      type: object
+      properties:
+        id:
+          type: string
+        source_product_variant_id:
+          type: string
+        target_product_variant_id:
+          type: string
+        reference_type:
+          type: string
+          enum: [SIMILAR, ACCESSORIES, REPLACEMENT_PARTS, COMPLEMENTARY]
+        targetProduct:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            sku:
+              type: string
+            ean:
+              type: string
+            product:
+              type: object
+              properties:
+                id:
+                  type: string
+                title:
+                  type: string
+                thumbnail:
+                  type: string
+                description:
+                  type: string
+    
+    CreateProductReferenceRequest:
+      type: object
+      required:
+        - referenceType
+        - targetProducts
+      properties:
+        referenceType:
+          type: string
+          enum: [SIMILAR, ACCESSORIES, REPLACEMENT_PARTS, COMPLEMENTARY]
+        targetProducts:
+          type: array
+          items:
+            type: string
+    
+    ServiceInstance:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        payment_type:
+          type: string
+          enum: [ONE_TIME, WEEKLY, MONTHLY, YEARLY]
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, EXPIRED]
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        customer:
+          type: object
+          properties:
+            email:
+              type: string
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        product_variant:
+          type: object
+          properties:
+            id:
+              type: string
+            product:
+              type: object
+              properties:
+                id:
+                  type: string
+        totals:
+          type: object
+          properties:
+            currency:
+              type: string
+            total_price:
+              type: object
+              properties:
+                value:
+                  type: number
+    
+    CreateServiceInstanceRequest:
+      type: object
+      required:
+        - name
+        - payment_type
+        - customer_id
+        - product_variant_id
+        - start_date
+        - currency_code
+        - region_id
+      properties:
+        name:
+          type: string
+        payment_type:
+          type: string
+          enum: [ONE_TIME, WEEKLY, MONTHLY, YEARLY]
+        customer_id:
+          type: string
+        product_variant_id:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        assets:
+          type: array
+          items:
+            type: string
+        currency_code:
+          type: string
+        region_id:
+          type: string
+
+    UpdateServiceInstanceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, EXPIRED]
+        payment_type:
+          type: string
+          enum: [ONE_TIME, WEEKLY, MONTHLY, YEARLY]
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        purchase_date:
+          type: string
+          format: date-time
+        totals:
+          type: object
+
+    TransferOwnershipRequest:
+      type: object
+      required:
+        - new_owner_id
+      properties:
+        new_owner_id:
+          type: string
+    
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        thumbnail:
+          type: string
+        serial_number:
+          type: string
+        end_of_warranty_date:
+          type: string
+          format: date-time
+        address:
+          type: object
+          properties:
+            address_1:
+              type: string
+            city:
+              type: string
+            country_code:
+              type: string
+            postal_code:
+              type: string
+            province:
+              type: string
+            phone:
+              type: string
+        product_variant:
+          type: object
+          properties:
+            id:
+              type: string
+            product:
+              type: object
+              properties:
+                id:
+                  type: string
+        customer:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+        totals:
+          type: object
+          properties:
+            currency:
+              type: string
+            total_price:
+              type: object
+              properties:
+                value:
+                  type: number
+
+    CreateAssetRequest:
+      type: object
+      required:
+        - name
+        - product_variant_id
+        - customer_id
+        - serial_number
+        - currency_code
+        - region_id
+        - address
+      properties:
+        name:
+          type: string
+        product_variant_id:
+          type: string
+        customer_id:
+          type: string
+        thumbnail:
+          type: string
+        serial_number:
+          type: string
+        end_of_warranty_date:
+          type: string
+          format: date-time
+        currency_code:
+          type: string
+        region_id:
+          type: string
+        address:
+          type: object
+          required:
+            - address_1
+            - city
+            - country_code
+            - postal_code
+            - province
+          properties:
+            address_1:
+              type: string
+            city:
+              type: string
+            country_code:
+              type: string
+            postal_code:
+              type: string
+            province:
+              type: string
+            phone:
+              type: string
+
+    UpdateAssetRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        thumbnail:
+          type: string
+        serial_number:
+          type: string
+        end_of_warranty_date:
+          type: string
+          format: date-time
+        totals:
+          type: object
+
+paths:
+  /products/{id}/variants/{variantId}/references:
+    get:
+      tags:
+        - Products
+      summary: Get product variant references
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: referenceType
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Successfully retrieved product references
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productReferences:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductReference'
+                  count:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+    
+    post:
+      tags:
+        - Products
+      summary: Create product references
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductReferenceRequest'
+      responses:
+        '200':
+          description: Successfully created product references
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productReferences:
+                    type: array
+                    items:
+                      type: object
+        '304':
+          description: Product references already exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /products/references/{id}:
+    delete:
+      tags:
+        - Products
+      summary: Delete product reference
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted product reference
+  
+  /service-instances:
+    get:
+      tags:
+        - Service Instances
+      summary: Get service instances
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: string
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: payment_type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Successfully retrieved service instances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  serviceInstances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ServiceInstance'
+                  count:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+    
+    post:
+      tags:
+        - Service Instances
+      summary: Create service instance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServiceInstanceRequest'
+      responses:
+        '200':
+          description: Successfully created service instance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+
+  /service-instances/featured:
+    get:
+      tags:
+        - Service Instances
+      summary: Get featured service instances
+      responses:
+        '200':
+          description: Successfully retrieved featured service instances
+  
+  /service-instances/{id}:
+    get:
+      tags:
+        - Service Instances
+      summary: Get service instance by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved service instance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  serviceInstance:
+                    $ref: '#/components/schemas/ServiceInstance'
+    
+    patch:
+      tags:
+        - Service Instances
+      summary: Update service instance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceInstanceRequest'
+      responses:
+        '200':
+          description: Successfully updated service instance
+    
+    delete:
+      tags:
+        - Service Instances
+      summary: Delete service instance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted service instance
+  
+  /service-instances/{id}/transfer-ownership:
+    post:
+      tags:
+        - Service Instances
+      summary: Transfer service instance ownership
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferOwnershipRequest'
+      responses:
+        '200':
+          description: Successfully transferred ownership
+  
+  /service-instances/{id}/assets/{assetId}/link:
+    post:
+      tags:
+        - Service Instances
+        - Assets
+      summary: Link asset to service instance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully linked asset to service instance
+    
+    delete:
+      tags:
+        - Service Instances
+        - Assets
+      summary: Unlink asset from service instance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully unlinked asset from service instance
+  
+  /assets:
+    get:
+      tags:
+        - Assets
+      summary: Get assets
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Successfully retrieved assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  count:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+    
+    post:
+      tags:
+        - Assets
+      summary: Create asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      responses:
+        '200':
+          description: Successfully created asset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+  
+  /assets/{id}:
+    get:
+      tags:
+        - Assets
+      summary: Get asset by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved asset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  asset:
+                    $ref: '#/components/schemas/Asset'
+    
+    patch:
+      tags:
+        - Assets
+      summary: Update asset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetRequest'
+      responses:
+        '200':
+          description: Successfully updated asset
+    
+    delete:
+      tags:
+        - Assets
+      summary: Delete asset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted asset
+  
+  /assets/{id}/transfer-ownership:
+    post:
+      tags:
+        - Assets
+      summary: Transfer asset ownership
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferOwnershipRequest'
+      responses:
+        '200':
+          description: Successfully transferred ownership
+  
+  /assets/{id}/compatible-services:
+    get:
+      tags:
+        - Assets
+      summary: Get compatible services for asset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved compatible services 
