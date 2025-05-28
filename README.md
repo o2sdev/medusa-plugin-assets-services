@@ -66,8 +66,8 @@ You can find admin [API definition](openapi.yml) in repo files.
 - Adds new admin menu entries:
     - Assets
     - Services
-- Adds new component on product variant page to managae product referencets
-- Deep-linking between assets, services, and products
+- Adds a new component on the product variant page to manage product references
+- "Deep-linking" between assets, services, and products
 
 ## Compatibility
 
