@@ -1,5 +1,5 @@
 
-# Medusa Assets & Services Manager
+# Medusa Assets & Services Plugin
 
 A Medusa.js plugin for managing customer-linked product instances and service subscriptions.
 
@@ -14,9 +14,8 @@ The `assets-services` plugin extends Medusa with the ability to manage **physica
 
 The plugin enhances the Medusa admin interface with new panels for managing **assets**, **services**, and **product references**, enabling rich linking and management flows.
 
-This plugin is used in [Open Self Service](https://github.com/o2sdev/openselfservice), a composable customer portal for viewing owned products, warranty info, and activating additional services.
-
-You can find admin [API definition](openapi.yml) in repo files.
+This plugin is used in [Open Self Service](https://github.com/o2sdev/openselfservice), a composable customer portal for viewing and managing owned products, warranties, and activating additional services.
+You can also use the plugin independently.
 
 ## Installation
 
@@ -85,9 +84,12 @@ Although this plugin is generic and can be used independently, it was developed 
 
 Explore the Open Self Service project to see how this plugin supports real-world industrial self-service scenarios.
 
-## Models schema
+## Docs
+You can find admin [API definition](docs/openapi.yml) in repo files.
 
-### Services & Assets
+### Models schema
+
+#### Services & Assets
 
 ```mermaid
 ---

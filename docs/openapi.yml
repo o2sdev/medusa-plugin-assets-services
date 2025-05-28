@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Medusa Product Relations Plugin API
+  title: Medusa Assets & Services Plugin API
   description: API for managing product relations, service instances, and assets
   version: 1.0.0
 servers:
