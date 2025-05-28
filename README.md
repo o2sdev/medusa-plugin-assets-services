@@ -96,7 +96,7 @@ Explore the Open Self Service project to see how this plugin supports real-world
       hideEmptyMembersBox: true
 ---
 classDiagram
-    ServiceInstance --> PaymenntTypeEnum : has
+    ServiceInstance --> PaymentTypeEnum : has
     ServiceInstance --> ServiceItemStatusEnum : has
 
     ServiceInstance "0..*" <--> "0..*" Asset
@@ -123,7 +123,7 @@ classDiagram
         Price price
     }
 
-    class PaymenntTypeEnum{
+    class PaymentTypeEnum{
         ONE_TIME
         WEEKLY
         MONTHLY
