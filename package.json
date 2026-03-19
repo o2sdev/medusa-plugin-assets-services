@@ -1,6 +1,6 @@
 {
   "name": "@o2s/medusa-plugin-assets-services",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Manage customer-linked product instances, service subscriptions and product relations.",
   "author": "Open Self Service (https://www.openselfservice.com)",
   "license": "MIT",
@@ -69,5 +69,6 @@
   },
   "dependencies": {
     "@medusajs/ui": "4.0.4"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
