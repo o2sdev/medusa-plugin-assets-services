@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { sdk } from "../../lib/sdk"
 import { Container, createDataTableCommandHelper, DataTablePaginationState, DataTableRowSelectionState, useDataTable, usePrompt, Heading, createDataTableColumnHelper, DataTable, Text, Button, DataTableFilteringState, Input } from "@medusajs/ui"
 import { SquareTwoStack } from "@medusajs/icons"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -41,7 +42,7 @@ const AssetsTableWidget = () => {
 
     const { data: response, isLoading } = useQuery<AssetsResponseType>({
         queryKey: ["assets", pagination.pageSize, offset, search],
-        queryFn: () => fetch(`/admin/assets?limit=${pagination.pageSize}&offset=${offset}${search ? `&q=${encodeURIComponent(search)}` : ""}`).then(res => res.json())
+        queryFn: () => sdk.client.fetch(`/admin/assets?limit=${pagination.pageSize}&offset=${offset}${search ? `&q=${encodeURIComponent(search)}` : ""}`)
     })
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

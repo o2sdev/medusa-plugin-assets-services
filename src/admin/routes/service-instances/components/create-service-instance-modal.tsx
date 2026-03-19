@@ -1,4 +1,5 @@
 import { Button, DatePicker, FocusModal, Input, Select, usePrompt } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { useState, useEffect } from "react"
 import { CustomerType, PaymentTypeEnum } from "../../../../modules/assets-services/types"
 import { useQueryClient } from "@tanstack/react-query"
@@ -66,11 +67,7 @@ export const CreateServiceInstanceModal = ({
   const fetchRegions = async () => {
     setIsLoadingRegions(true)
     try {
-      const response = await fetch("/admin/regions")
-      if (!response.ok) {
-        throw new Error("Failed to fetch regions")
-      }
-      const data = await response.json()
+      const data = await sdk.client.fetch("/admin/regions")
       setRegions(data.regions || [])
     } catch (error) {
       console.error("Error fetching regions:", error)
@@ -157,18 +154,10 @@ export const CreateServiceInstanceModal = ({
     setFormError(null)
 
     try {
-      const response = await fetch("/admin/service-instances", {
+      await sdk.client.fetch("/admin/service-instances", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: payload,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to create service instance")
-      }
 
       // Invalidate service instances query to refetch the data
       queryClient.invalidateQueries({ queryKey: ["service-instances"] })

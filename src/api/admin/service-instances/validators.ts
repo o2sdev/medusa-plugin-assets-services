@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "@medusajs/framework/zod"
 
 export const PatchAdminUpdateServiceInstance = z.object({
     name: z.string().nullable().optional(),

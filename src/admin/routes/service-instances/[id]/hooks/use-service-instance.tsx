@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { sdk } from "../../../../lib/sdk"
 import { usePrompt } from "@medusajs/ui"
 import { ServiceInstanceResponseType } from "../../../../../modules/assets-services/types"
 import { useDeleteServiceInstanceMutation } from "../../../../mutations/delete-service-instance"
@@ -9,7 +10,7 @@ export const useServiceInstance = (id: string | undefined) => {
   
   const { data, isLoading } = useQuery<ServiceInstanceResponseType>({
     queryKey: ["service-instance", id],
-    queryFn: () => fetch(`/admin/service-instances/${id}`).then(res => res.json()),
+    queryFn: () => sdk.client.fetch(`/admin/service-instances/${id}`),
     enabled: !!id
   })
   

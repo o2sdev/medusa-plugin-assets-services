@@ -3,7 +3,7 @@ import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { ASSETS_SERVICES_MODULE } from "../../../../modules/assets-services";
 import AssetsServicesModuleService from "../../../../modules/assets-services/service";
 import { PatchAdminUpdateServiceInstance } from "../validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 type PatchAdminUpdateServiceInstanceType = z.infer<typeof PatchAdminUpdateServiceInstance>
 

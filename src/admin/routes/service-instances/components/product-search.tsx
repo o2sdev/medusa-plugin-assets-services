@@ -1,4 +1,5 @@
 import { Button, Input } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { useState } from "react"
 import { ProductSearchResultType } from "../../../../modules/assets-services/types"
 import { ProductVariantDTO } from "@medusajs/framework/types"
@@ -26,8 +27,7 @@ export const ProductSearch = ({
 
     setIsSearchingProducts(true)
     try {
-      const response = await fetch(`/admin/product-variants?q=${encodeURIComponent(productSearchQuery)}`)
-      const data = await response.json()
+      const data = await sdk.client.fetch(`/admin/product-variants?q=${encodeURIComponent(productSearchQuery)}`)
       setProductSearchResults(data)
     } catch (error) {
       console.error("Error searching products:", error)

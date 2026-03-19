@@ -1,4 +1,5 @@
 import { useMutation, UseMutationResult, QueryClient } from "@tanstack/react-query"
+import { sdk } from "../lib/sdk"
 
 export type DeleteServiceInstanceParams = {
   queryClient: QueryClient
@@ -13,16 +14,9 @@ export const useDeleteServiceInstanceMutation = ({
 }: DeleteServiceInstanceParams): UseMutationResult<unknown, Error, string> => {
   return useMutation({
     mutationFn: async (serviceInstanceId: string) => {
-      const response = await fetch(`/admin/service-instances/${serviceInstanceId}`, {
+      return await sdk.client.fetch(`/admin/service-instances/${serviceInstanceId}`, {
         method: "DELETE",
-        credentials: "include",
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete service instance")
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

@@ -1,4 +1,5 @@
 import { Container, Heading, IconButton, Text, usePrompt } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "react-router-dom"
 import { ArrowUturnLeft, Pencil, Trash } from "@medusajs/icons"
@@ -20,7 +21,7 @@ const AssetDetailsPage = () => {
     const { id } = useParams()
     const { data: response, isLoading } = useQuery<AssetResponseType>({
         queryKey: ["asset", id],
-        queryFn: () => fetch(`/admin/assets/${id}`).then(res => res.json())
+        queryFn: () => sdk.client.fetch(`/admin/assets/${id}`)
     })
     const dialog = usePrompt();
     const queryClient = useQueryClient()

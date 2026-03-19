@@ -2,7 +2,7 @@ import { ContainerRegistrationKeys, QueryContext } from "@medusajs/framework/uti
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework";
 import ServiceInstanceCustomerLink from "../../../links/service-instance-customer";
 import { PostAdminCreateServiceInstance } from "./validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 import { createServiceInstanceWorkflow } from "../../../workflows/create-service-instance-workflow";
 type PostAdminCreateServiceInstanceType = z.infer<typeof PostAdminCreateServiceInstance>
 

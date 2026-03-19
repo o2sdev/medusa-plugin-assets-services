@@ -1,4 +1,5 @@
 import { Container, createDataTableColumnHelper, DataTable, useDataTable, DataTablePaginationState, createDataTableCommandHelper, DataTableRowSelectionState, usePrompt, Button, Input, DataTableFilteringState, createDataTableFilterHelper } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { SingleColumnLayout } from "../../../layouts/single-column"
 import { useNavigate } from "react-router-dom"
 import { useMemo, useState } from "react"
@@ -25,8 +26,7 @@ export const ServiceInstancesTable = () => {
     const { data: response, isLoading } = useQuery({
         queryKey: ["service-instances", pagination.pageSize, offset, search, filtering],
         queryFn: () =>
-            fetch(`/admin/service-instances?limit=${pagination.pageSize}&offset=${offset}${search ? `&q=${encodeURIComponent(search)}` : ""}${filtering.payment_type ? `&payment_type=${filtering.payment_type}` : ""}${filtering.status ? `&status=${filtering.status}` : ""}`)
-                .then(res => res.json()),
+            sdk.client.fetch(`/admin/service-instances?limit=${pagination.pageSize}&offset=${offset}${search ? `&q=${encodeURIComponent(search)}` : ""}${filtering.payment_type ? `&payment_type=${filtering.payment_type}` : ""}${filtering.status ? `&status=${filtering.status}` : ""}`),
     })
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

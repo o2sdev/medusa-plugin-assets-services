@@ -1,4 +1,5 @@
 import { usePrompt } from "@medusajs/ui"
+import { sdk } from "../../../../lib/sdk"
 import { useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { PaymentTypeEnum, ServiceInstanceStatusEnum, ServiceInstanceType } from "../../../../../modules/assets-services/types"
@@ -28,23 +29,20 @@ export const EditServiceInstanceDrawer = ({
     })
 
     const handleSubmit = form.handleSubmit(async ({ name, status, payment_type, start_date, end_date, purchase_date }) => {
-        const result = await fetch(`/admin/service-instances/${instance.id}`, {
-            method: "PATCH",
-            body: JSON.stringify({ name, status, payment_type, start_date, end_date, purchase_date }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-
-        if (!result.ok) {
+        try {
+            await sdk.client.fetch(`/admin/service-instances/${instance.id}`, {
+                method: "PATCH",
+                body: { name, status, payment_type, start_date, end_date, purchase_date },
+            })
+            queryClient.invalidateQueries({ queryKey: ["service-instance", instance.id] })
+            onOpenChange(false)
+        } catch (error: any) {
             dialog({
                 title: "Error updating service instance",
-                description: result.statusText,
+                description: error?.message || "Failed to update service instance",
             })
-            throw new Error("Failed to update service instance")
+            throw error
         }
-        queryClient.invalidateQueries({ queryKey: ["service-instance", instance.id] })
-        onOpenChange(false)
     })
 
     return (

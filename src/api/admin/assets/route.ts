@@ -2,7 +2,7 @@ import { ContainerRegistrationKeys, QueryContext } from "@medusajs/framework/uti
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework";
 import { createAssetWorkflow } from "../../../workflows/create-asset-workflow";
 import { PostAdminCreateAsset } from "./validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 type PostAdminCreateAssetType = z.infer<typeof PostAdminCreateAsset>
 

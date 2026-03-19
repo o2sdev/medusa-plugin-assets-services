@@ -3,7 +3,7 @@ import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import AssetsServicesModuleService from "../../../../../../../modules/assets-services/service";
 import { ASSETS_SERVICES_MODULE } from "../../../../../../../modules/assets-services";
 import { PostAdminCreateProductReference } from "../../../../validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 type ProductReferenceMethodsType = z.infer<typeof PostAdminCreateProductReference>
 

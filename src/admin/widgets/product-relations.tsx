@@ -1,4 +1,5 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import { sdk } from "../lib/sdk"
 import { DetailWidgetProps, AdminProductVariant } from "@medusajs/framework/types"
 import {
   Container,
@@ -37,10 +38,10 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
   const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>({})
 
   const { data: referencesData, isLoading } = useQuery<ProductReferencesResponseType>({
-    queryFn: () => fetch(`/admin/products/${productId}/variants/${variantId}/references`, { credentials: "include" }).then(res => res.json()),
+    queryFn: () => sdk.client.fetch(`/admin/products/${productId}/variants/${variantId}/references`),
     queryKey: [["product", productId, "variant", variantId, "references"]],
   })
-
+  console.log({MEDUSA_AUTH_TYPE: import.meta.env.MEDUSA_AUTH_TYPE});
   const searchProducts = async (resetPage = true) => {
     const currentPage = resetPage ? 1 : page
     if (resetPage) {
@@ -59,8 +60,7 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
         queryParams.append("q", productSearchQuery)
       }
       
-      const response = await fetch(`/admin/product-variants?${queryParams.toString()}`, { credentials: "include" })
-      const data = await response.json()
+      const data = await sdk.client.fetch(`/admin/product-variants?${queryParams.toString()}`)
       
       // Filter out current variant and already referenced variants
       if (data.variants) {
@@ -155,31 +155,24 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
 
   const addReferenceMutation = useMutation({
     mutationFn: async ({ targetVariantId, referenceType }: { targetVariantId: string, referenceType: string }) => {
-      const response = await fetch(`/admin/products/${productId}/variants/${variantId}/references`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          targetProducts: [targetVariantId],
-          referenceType: referenceType,
-        }),
-      })
-
-      if (response.status === 304) {
-        prompt({
-          title: "Error adding reference",
-          description: "Product reference already exist",
+      try {
+        return await sdk.client.fetch(`/admin/products/${productId}/variants/${variantId}/references`, {
+          method: "POST",
+          body: {
+            targetProducts: [targetVariantId],
+            referenceType: referenceType,
+          },
         })
-        return
+      } catch (error: any) {
+        if (error?.status === 304) {
+          prompt({
+            title: "Error adding reference",
+            description: "Product reference already exist",
+          })
+          return
+        }
+        throw error
       }
-
-      if (!response.ok) {
-        throw new Error("Failed to add reference")
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       setSelectedVariant("")
@@ -199,19 +192,12 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
 
   const deleteReferenceMutation = useMutation({
     mutationFn: async (targetVariantId: string) => {
-      const response = await fetch(
+      return await sdk.client.fetch(
         `/admin/products/references/${targetVariantId}`,
         {
           method: "DELETE",
-          credentials: "include",
         }
       )
-
-      if (!response.ok) {
-        throw new Error("Failed to delete reference")
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       setRowSelection({})
@@ -450,7 +436,7 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
       <div className="px-6 py-4">
         {isLoading ? (
           <Text>Loading references...</Text>
-        ) : referencesData?.productReferences.length === 0 ? (
+        ) : referencesData?.productReferences?.length === 0 ? (
           <Text className="text-ui-fg-subtle">Product has no references</Text>
         ) : (
           <SingleColumnLayout>

@@ -1,7 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework";
 import { transferServiceInstanceOwnershipWorkflow } from "../../../../../workflows/transfer-service-instance-ownership-workflow";
 import { PostAdminTransferServiceInstanceOwnership } from "../../validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 
 type PostAdminTransferServiceInstanceOwnershipType = z.infer<typeof PostAdminTransferServiceInstanceOwnership>
 

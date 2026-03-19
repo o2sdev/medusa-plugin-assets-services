@@ -1,6 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework";
 import { PostAdminTransferAssetOwnership } from "../../validators";
-import { z } from "zod";
+import { z } from "@medusajs/framework/zod";
 import { updateLinksWorkflow } from "@medusajs/medusa/core-flows";
 import { ASSETS_SERVICES_MODULE } from "../../../../../modules/assets-services";
 import { Modules } from "@medusajs/framework/utils";

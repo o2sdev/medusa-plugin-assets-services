@@ -1,4 +1,5 @@
 import { usePrompt } from "@medusajs/ui"
+import { sdk } from "../../../../lib/sdk"
 import { useForm } from "react-hook-form"
 import { useQueryClient } from "@tanstack/react-query"
 import { FormDrawer } from "../../../../components/form.drawer"
@@ -22,23 +23,20 @@ export const EditAssetDrawer = ({ isOpen, onOpenChange, asset }: {
     })
 
     const handleSubmit = async (data: any) => {
-        const result = await fetch(`/admin/assets/${asset.id}`, {
-            method: "PATCH",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-
-        if (!result.ok) {
+        try {
+            await sdk.client.fetch(`/admin/assets/${asset.id}`, {
+                method: "PATCH",
+                body: data,
+            })
+            queryClient.invalidateQueries({ queryKey: ["asset", asset.id] })
+            onOpenChange(false)
+        } catch (error: any) {
             dialog({
                 title: "Error updating asset",
-                description: result.statusText,
+                description: error?.message || "Failed to update asset",
             })
-            throw new Error("Failed to update asset")
+            throw error
         }
-        queryClient.invalidateQueries({ queryKey: ["asset", asset.id] })
-        onOpenChange(false)
     }
 
     return (

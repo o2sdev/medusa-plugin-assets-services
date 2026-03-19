@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { sdk } from "../../../../lib/sdk"
 import { useNavigate } from "react-router-dom"
 import { Container, Heading, Button, DataTable, useDataTable, createDataTableColumnHelper, Drawer, Text, DataTableRowSelectionState, createDataTableCommandHelper } from "@medusajs/ui"
 import { Plus } from "@medusajs/icons"
@@ -71,26 +72,22 @@ export const BoughtServicesTable = ({ serviceInstances, isLoading, asset }: {
 
     const { data: compatibleServices, isLoading: isLoadingCompatibleServices } = useQuery<CompatibleService[]>({
         queryKey: ["compatible-services", asset.id],
-        queryFn: () => fetch(`/admin/assets/${asset.id}/compatible-services`)
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to fetch compatible services")
-                return res.json()
-            })
-            .then(data => {
-                // Filter out services that are already assigned to this asset
-                const services = data.compatibleServices || []
+        queryFn: async () => {
+            const data = await sdk.client.fetch(`/admin/assets/${asset.id}/compatible-services`)
+            // Filter out services that are already assigned to this asset
+            const services = data.compatibleServices || []
                 
-                // Only keep services that don't already exist
-                return services.filter((service: CompatibleService) => {
+            // Only keep services that don't already exist
+            return services.filter((service: CompatibleService) => {
                     // For each service, check if it's already assigned
                     const alreadyAssigned = serviceInstances?.some((instance: any) => {
                         return instance.product_variant?.id === service.product?.id;
                     });
                     
                     // Keep only services that are not already assigned
-                    return !alreadyAssigned;
-                });
-            }),
+                return !alreadyAssigned;
+            })
+        },
         enabled: isProductSelectionOpen
     })
 

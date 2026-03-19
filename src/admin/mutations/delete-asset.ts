@@ -1,5 +1,5 @@
-
 import { useMutation, UseMutationResult, QueryClient } from "@tanstack/react-query"
+import { sdk } from "../lib/sdk"
 
 export type DeleteAssetParams = {
   queryClient: QueryClient
@@ -14,16 +14,9 @@ export const useDeleteAssetMutation = ({
 }: DeleteAssetParams): UseMutationResult<unknown, Error, string> => {
   return useMutation({
     mutationFn: async (assetId: string) => {
-      const response = await fetch(`/admin/assets/${assetId}`, {
+      return await sdk.client.fetch(`/admin/assets/${assetId}`, {
         method: "DELETE",
-        credentials: "include",
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete asset")
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

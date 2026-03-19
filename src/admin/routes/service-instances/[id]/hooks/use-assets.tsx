@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { sdk } from "../../../../lib/sdk"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { usePrompt } from "@medusajs/ui"
 import { useDeleteAssetMutation } from "../../../../mutations/delete-asset"
@@ -18,11 +19,7 @@ export const useAssets = (serviceInstanceId: string | undefined) => {
       }
       setIsSearching(true)
       try {
-        const response = await fetch(`/admin/assets?name=${encodeURIComponent(assetSearchQuery)}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch assets")
-        }
-        return await response.json()
+        return await sdk.client.fetch(`/admin/assets?name=${encodeURIComponent(assetSearchQuery)}`)
       } finally {
         setIsSearching(false)
       }
@@ -34,22 +31,19 @@ export const useAssets = (serviceInstanceId: string | undefined) => {
     if (!serviceInstanceId) return
     
     try {
-      const response = await fetch(`/admin/service-instances/${serviceInstanceId}/assets/${assetId}/link`, {
+      await sdk.client.fetch(`/admin/service-instances/${serviceInstanceId}/assets/${assetId}/link`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
       })
       
-      if(response.status === 304) {
-        throw new Error("Asset already linked")
-      }
-      if (!response.ok) {
-        throw new Error("Failed to link asset")
-      }
-      
       queryClient.invalidateQueries({ queryKey: ["service-instance", serviceInstanceId] })
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.status === 304) {
+        prompt({
+          title: "Error linking asset",
+          description: "Asset already linked",
+        })
+        return
+      }
       prompt({
         title: "Error linking asset",
         description: error instanceof Error ? error.message : "Unknown error occurred",

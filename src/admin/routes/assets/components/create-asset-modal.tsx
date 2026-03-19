@@ -1,4 +1,5 @@
 import { Button, DatePicker, FocusModal, Input, usePrompt, Select } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { useState, useEffect } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { ProductSearch } from "../../service-instances/components/product-search"
@@ -55,11 +56,7 @@ export const CreateAssetModal = ({ open, setOpen }: CreateAssetModalProps) => {
   const fetchRegions = async () => {
     setIsLoadingRegions(true)
     try {
-      const response = await fetch("/admin/regions")
-      if (!response.ok) {
-        throw new Error("Failed to fetch regions")
-      }
-      const data = await response.json()
+      const data = await sdk.client.fetch("/admin/regions")
       setRegions(data.regions || [])
     } catch (error) {
       console.error("Error fetching regions:", error)
@@ -168,18 +165,10 @@ export const CreateAssetModal = ({ open, setOpen }: CreateAssetModalProps) => {
     setFormError(null)
 
     try {
-      const response = await fetch("/admin/assets", {
+      await sdk.client.fetch("/admin/assets", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: payload,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to create asset")
-      }
 
       // Invalidate assets query to refetch the data
       queryClient.invalidateQueries({ queryKey: ["assets"] })

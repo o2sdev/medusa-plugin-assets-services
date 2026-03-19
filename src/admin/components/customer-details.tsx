@@ -1,4 +1,5 @@
 import { Container, Heading, Text } from "@medusajs/ui";
+import { sdk } from "../lib/sdk";
 import { CustomerDTO } from "@medusajs/framework/types";
 import { SectionRow } from "./section-row";
 import { useState } from "react";
@@ -84,7 +85,7 @@ const TransferOwnershipDrawer = ({
 
     const { data: customers, isLoading } = useQuery({
         queryKey: ["customers"],
-        queryFn: () => fetch("/admin/customers").then(res => res.json()),
+        queryFn: () => sdk.client.fetch("/admin/customers"),
         enabled: isOpen,
     });
     
@@ -109,21 +110,10 @@ const TransferOwnershipDrawer = ({
     const handleSubmit = async (data: { new_owner_id: string }) => {
         try {
             const endpoint = getEndpoint();
-            const result = await fetch(endpoint, {
+            await sdk.client.fetch(endpoint, {
                 method: "POST",
-                body: JSON.stringify(data),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                body: data,
             });
-
-            if (!result.ok) {
-                dialog({
-                    title: "Error transferring ownership",
-                    description: result.statusText,
-                });
-                throw new Error("Failed to transfer ownership");
-            }
             
             // Invalidate queries to refresh data
             queryClient.invalidateQueries({ queryKey: [entityType, entityId] });

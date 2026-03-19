@@ -1,4 +1,5 @@
 import { Button, Input } from "@medusajs/ui"
+import { sdk } from "../../../lib/sdk"
 import { useState } from "react"
 import { CustomerType, CustomerSearchResultType } from "../../../../modules/assets-services/types"
 
@@ -25,8 +26,7 @@ export const CustomerSearch = ({
 
     setIsSearchingCustomers(true)
     try {
-      const response = await fetch(`/admin/customers?q=${encodeURIComponent(customerSearchQuery)}`)
-      const data = await response.json()
+      const data = await sdk.client.fetch(`/admin/customers?q=${encodeURIComponent(customerSearchQuery)}`)
       setCustomerSearchResults(data)
     } catch (error) {
       console.error("Error searching customers:", error)
