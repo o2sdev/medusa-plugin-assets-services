@@ -41,7 +41,7 @@ const ProductRelationsWidget = ({ data: productVariant }: DetailWidgetProps<Admi
     queryFn: () => sdk.client.fetch(`/admin/products/${productId}/variants/${variantId}/references`),
     queryKey: [["product", productId, "variant", variantId, "references"]],
   })
-  console.log({MEDUSA_AUTH_TYPE: import.meta.env.MEDUSA_AUTH_TYPE});
+
   const searchProducts = async (resetPage = true) => {
     const currentPage = resetPage ? 1 : page
     if (resetPage) {
